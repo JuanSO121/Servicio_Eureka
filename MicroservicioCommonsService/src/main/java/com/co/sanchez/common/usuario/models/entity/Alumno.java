@@ -1,4 +1,4 @@
-package com.co.sanchez.usuario.models.entity;
+package com.co.sanchez.common.usuario.models.entity;
 
 import jakarta.persistence.*;
 import java.util.Date;
