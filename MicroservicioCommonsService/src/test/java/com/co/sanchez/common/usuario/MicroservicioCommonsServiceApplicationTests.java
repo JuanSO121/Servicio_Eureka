@@ -1,11 +1,11 @@
-package com.co.sanchez.commons;
+package com.co.sanchez.common.usuario;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ContextConfiguration;
 
 @ContextConfiguration
-class CommonsApplicationTests {
+class MicroservicioCommonsServiceApplicationTests {
 
 	@Test
 	void contextLoads() {

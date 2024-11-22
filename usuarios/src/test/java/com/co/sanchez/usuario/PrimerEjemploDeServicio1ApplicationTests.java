@@ -4,10 +4,10 @@ import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class PrimerEjemploDeServicio1ApplicationTests {
+public class PrimerEjemploDeServicio1ApplicationTests {
 
 	@Test
 	void contextLoads() {
+		// This test will simply check if the context loads successfully
 	}
-
 }

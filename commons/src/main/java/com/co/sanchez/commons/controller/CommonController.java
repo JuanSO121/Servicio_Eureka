@@ -1,7 +1,7 @@
 package com.co.sanchez.commons.controller;
 
-import com.co.sanchez.usuario.models.entity.Alumno;
-import com.co.sanchez.usuario.service.AlumnoService;
+import com.co.sanchez.commons.service.CommonService;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
@@ -11,75 +11,42 @@ import org.springframework.web.bind.annotation.*;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+import java.util.logging.Logger;
 
-@RestController
-@RequestMapping("/api/alumnos")
-public class AlumnoController {
+public class CommonController<E, S extends CommonService<E>> {
+    private static final org.slf4j.Logger logger = org.slf4j.LoggerFactory.getLogger(CommonController.class);
 
-    private final AlumnoService service;
-
-    @Value("${config.balanceador.test}")
-    private String balanceadorTest;
 
     @Autowired
-    public AlumnoController(AlumnoService service) {
-        this.service = service;
+    protected S service;
+
+    @Value("${config.balanceador.test}")
+    protected String balanceadorTest;
+
+    @GetMapping("/balanceador-test")
+    public ResponseEntity<?> balanceadorTest(){
+        Map<String, Object> response = new HashMap<String, Object>();
+        response.put("balanceador", balanceadorTest);
+        response.put("entity", service.findAll());
+        return ResponseEntity.ok().body(response);
     }
 
     @GetMapping
-    public ResponseEntity<Iterable<Alumno>> getAll() {
+    public ResponseEntity<Iterable<E>> getAll() {
         return ResponseEntity.ok().body(service.findAll());
     }
 
-//    @GetMapping("/balanceador-test")
-//    public ResponseEntity<?> balanceadorTest() {
-//        Map<String, Object> response = new HashMap<String, Object> ();
-//        response.put("balanceador", balanceadorTest);
-//        response.put("alumno", service.findAll());
-//
-//        return ResponseEntity.ok().body(response);
-//    }
-
-    @GetMapping("/balanceador-test")
-    public ResponseEntity<?> balanceadorTest() {
-        Map<String, Object> response = new HashMap<>();
-        try {
-            response.put("balanceador", balanceadorTest); // Variable de entorno
-            response.put("alumno", service.findAll()); // Lista de alumnos
-            return ResponseEntity.ok(response);
-        } catch (Exception e) {
-            response.put("error", "Error al obtener los datos de alumnos");
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
-        }
-    }
-
     @GetMapping("/{id}")
-    public ResponseEntity<Alumno> getById(@PathVariable Long id) {
-        Optional<Alumno> alumno = service.findById(id);
-        return alumno.map(ResponseEntity::ok)
+    public ResponseEntity<E> getById(@PathVariable Long id) {
+        Optional<E> entity  = service.findById(id);
+        return entity.map(ResponseEntity::ok)
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
-
     @PostMapping
-    public ResponseEntity<Alumno> create(@RequestBody Alumno alumno) {
-        Alumno savedAlumno = service.save(alumno);
-        return ResponseEntity.status(HttpStatus.CREATED).body(savedAlumno);
-    }
-
-    @PutMapping("/{id}")
-    public ResponseEntity<Alumno> update(@PathVariable Long id, @RequestBody Alumno alumno) {
-        Optional<Alumno> existingAlumno = service.findById(id);
-        if (existingAlumno.isPresent()) {
-            Alumno updatedAlumno = existingAlumno.get();
-            updatedAlumno.setNombre(alumno.getNombre());
-            updatedAlumno.setApellido(alumno.getApellido());
-            updatedAlumno.setEmail(alumno.getEmail());
-            service.save(updatedAlumno);
-            return ResponseEntity.ok(updatedAlumno);
-        } else {
-            return ResponseEntity.notFound().build();
-        }
+    public ResponseEntity<E> create(@RequestBody E entity) {
+        E savedEntity= service.save(entity);
+        return ResponseEntity.status(HttpStatus.CREATED).body(savedEntity);
     }
 
     @DeleteMapping("/{id}")
